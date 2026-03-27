@@ -19,6 +19,8 @@ Grab the latest release for your platform:
 | Windows | `.msi` installer |
 | Linux | `.AppImage` / `.deb` |
 
+> **macOS note:** On first launch, macOS will block the app since it isn't notarized. **Right-click** the app → **Open** → click **Open** again. You only need to do this once. If you see "damaged", run `xattr -cr /Applications/Eagle\ Markdown.app` in Terminal first.
+
 ## Features
 
 - **Fast rendering** --- Markdown is parsed in Rust via pulldown-cmark, not in the browser

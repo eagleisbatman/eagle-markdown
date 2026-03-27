@@ -70,6 +70,16 @@ jobs:
             | macOS (Intel) | `.dmg` (x86_64) |
             | Windows | `.msi` |
             | Linux | `.AppImage` / `.deb` |
+
+            ### macOS — first launch
+
+            Since the app isn't notarized with Apple, macOS will block it on first open.
+            **Right-click** the app → **Open** → click **Open** in the dialog. You only need to do this once.
+
+            If you see "damaged", run this in Terminal first:
+            ```
+            xattr -cr /Applications/Eagle\ Markdown.app
+            ```
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
