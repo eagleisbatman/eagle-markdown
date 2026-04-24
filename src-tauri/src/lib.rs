@@ -4,6 +4,8 @@ use std::sync::Mutex;
 use tauri::menu::{AboutMetadata, MenuBuilder, MenuItem, SubmenuBuilder};
 use tauri::Emitter;
 
+const MAX_MARKDOWN_BYTES: u64 = 10 * 1024 * 1024;
+
 // --- State ---
 
 #[derive(Default)]
@@ -57,6 +59,24 @@ fn escape_html(s: &str) -> String {
         }
     }
     out
+}
+
+fn is_markdown_path(path: &std::path::Path) -> bool {
+    path.extension()
+        .and_then(|ext| ext.to_str())
+        .map(|ext| matches!(ext.to_ascii_lowercase().as_str(), "md" | "mdx" | "markdown"))
+        .unwrap_or(false)
+}
+
+fn normalize_code_language(language: &str) -> String {
+    language
+        .split([',', ' '])
+        .next()
+        .unwrap_or("")
+        .trim()
+        .chars()
+        .filter(|c| c.is_ascii_alphanumeric() || matches!(c, '-' | '_' | '+'))
+        .collect()
 }
 
 // --- Markdown rendering ---
@@ -115,18 +135,13 @@ fn markdown_to_html(input: &str) -> String {
         match event {
             Event::Start(Tag::CodeBlock(kind)) => {
                 code_lang = match &kind {
-                    CodeBlockKind::Fenced(lang) => {
-                        lang.split([',', ' '])
-                            .next()
-                            .unwrap_or("")
-                            .trim()
-                            .to_string()
-                    }
+                    CodeBlockKind::Fenced(lang) => normalize_code_language(lang),
                     CodeBlockKind::Indented => String::new(),
                 };
                 code_text.clear();
                 in_code = true;
             }
+            Event::Html(raw) | Event::InlineHtml(raw) => events.push(Event::Text(raw)),
             other => events.push(other),
         }
     }
@@ -145,10 +160,22 @@ fn render_markdown(input: &str) -> String {
 
 #[tauri::command]
 fn render_file(path: &str) -> Result<FileData, String> {
-    let content = std::fs::read_to_string(path).map_err(|e| e.to_string())?;
+    let path_ref = std::path::Path::new(path);
+
+    if !is_markdown_path(path_ref) {
+        return Err("Eagle Markdown can only open .md, .mdx, or .markdown files.".into());
+    }
+
+    let metadata = std::fs::metadata(path_ref).map_err(|e| e.to_string())?;
+    if metadata.len() > MAX_MARKDOWN_BYTES {
+        return Err("That Markdown file is larger than the 10 MB safety limit.".into());
+    }
+
+    let canonical_path = std::fs::canonicalize(path_ref).map_err(|e| e.to_string())?;
+    let content = std::fs::read_to_string(&canonical_path).map_err(|e| e.to_string())?;
     let html = markdown_to_html(&content);
     Ok(FileData {
-        path: path.to_string(),
+        path: canonical_path.to_string_lossy().to_string(),
         html,
     })
 }
@@ -204,7 +231,7 @@ fn unwatch_file(state: tauri::State<'_, Mutex<WatcherState>>) -> Result<(), Stri
 fn get_initial_file() -> Option<String> {
     std::env::args().skip(1).find_map(|arg| {
         let path = std::path::Path::new(&arg);
-        if path.exists() {
+        if path.exists() && is_markdown_path(path) {
             std::fs::canonicalize(path)
                 .ok()
                 .map(|p| p.to_string_lossy().to_string())
@@ -262,9 +289,7 @@ pub fn run() {
                 .select_all()
                 .build()?;
 
-            let view_sub = SubmenuBuilder::new(handle, "View")
-                .fullscreen()
-                .build()?;
+            let view_sub = SubmenuBuilder::new(handle, "View").fullscreen().build()?;
 
             let window_sub = SubmenuBuilder::new(handle, "Window")
                 .minimize()
@@ -299,4 +324,33 @@ pub fn run() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running Eagle Markdown");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn markdown_renderer_escapes_raw_html() {
+        let html = markdown_to_html("# Safe\n<script>alert('xss')</script>");
+
+        assert!(html.contains("&lt;script&gt;"));
+        assert!(!html.contains("<script>"));
+    }
+
+    #[test]
+    fn fenced_code_language_is_normalized() {
+        let html = markdown_to_html("```rust onclick=bad\nfn main() {}\n```");
+
+        assert!(html.contains("language-rust"));
+        assert!(!html.contains("onclick"));
+    }
+
+    #[test]
+    fn frontmatter_is_removed_before_rendering() {
+        let html = markdown_to_html("---\ntitle: Demo\n---\n# Heading");
+
+        assert!(!html.contains("title: Demo"));
+        assert!(html.contains("<h1>Heading</h1>"));
+    }
 }

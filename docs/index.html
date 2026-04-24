@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Eagle Markdown</title>
+    <meta
+      name="description"
+      content="Eagle Markdown is a fast native Markdown reader for macOS, Windows, and Linux."
+    />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --ink: #241f1a;
+        --muted: #6f6257;
+        --paper: #fffdfa;
+        --surface: #f0ece4;
+        --accent: #9a5b32;
+        --line: rgba(36, 31, 26, 0.14);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --ink: #f2eee8;
+          --muted: #b6aa9c;
+          --paper: #211f1d;
+          --surface: #171615;
+          --accent: #d09b6f;
+          --line: rgba(242, 238, 232, 0.16);
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 18% 10%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 30rem),
+          var(--surface);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      main {
+        width: min(1120px, calc(100% - 32px));
+        min-height: 100vh;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 420px;
+        align-items: center;
+        gap: clamp(32px, 7vw, 92px);
+        padding: 56px 0;
+      }
+
+      h1 {
+        margin: 0;
+        max-width: 760px;
+        font-size: clamp(56px, 9vw, 112px);
+        line-height: 0.92;
+        letter-spacing: 0;
+      }
+
+      p {
+        margin: 24px 0 0;
+        max-width: 600px;
+        color: var(--muted);
+        font-size: clamp(18px, 2vw, 22px);
+        line-height: 1.5;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 34px;
+      }
+
+      .brand-mark {
+        width: 112px;
+        height: 112px;
+        margin-bottom: 30px;
+        border-radius: 28px;
+        box-shadow: 0 20px 54px rgba(36, 31, 26, 0.2);
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 48px;
+        padding: 0 18px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 700;
+        background: var(--paper);
+      }
+
+      .button.primary {
+        color: #fffdfa;
+        background: linear-gradient(135deg, #2b2520, var(--accent));
+        border-color: transparent;
+      }
+
+      .book {
+        position: relative;
+        min-height: 560px;
+        padding: 52px 48px;
+        background:
+          linear-gradient(90deg, rgba(0, 0, 0, 0.05), transparent 18px),
+          var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 16px 24px 24px 16px;
+        box-shadow: 0 28px 90px rgba(36, 31, 26, 0.18);
+      }
+
+      .book::after {
+        content: "";
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        width: 86px;
+        height: 86px;
+        border-bottom-right-radius: 24px;
+        background:
+          linear-gradient(135deg, transparent 50%, rgba(0, 0, 0, 0.08) 51%, transparent 64%),
+          linear-gradient(135deg, transparent 48%, color-mix(in srgb, var(--accent) 18%, var(--paper)) 49%);
+      }
+
+      .book h2 {
+        margin: 0 0 26px;
+        font-size: 32px;
+      }
+
+      .book ul {
+        display: grid;
+        gap: 18px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .book li {
+        padding-top: 18px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 17px;
+        line-height: 1.45;
+      }
+
+      .book strong {
+        display: block;
+        margin-bottom: 4px;
+        color: var(--ink);
+      }
+
+      @media (max-width: 900px) {
+        main {
+          grid-template-columns: 1fr;
+          align-items: start;
+        }
+
+        .book {
+          min-height: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section aria-labelledby="title">
+        <img
+          class="brand-mark"
+          src="assets/eagle-markdown-icon.png"
+          alt="Eagle Markdown eagle logo"
+          width="112"
+          height="112"
+        />
+        <h1 id="title">Eagle Markdown</h1>
+        <p>
+          A fast native Markdown reader with live reload, tabs, syntax
+          highlighting, and a calm book-like reading surface.
+        </p>
+        <div class="actions">
+          <a class="button primary" href="https://github.com/eagleisbatman/eagle-markdown/releases/latest">Download</a>
+          <a class="button" href="https://github.com/eagleisbatman/eagle-markdown">Source</a>
+        </div>
+      </section>
+
+      <aside class="book" aria-label="Highlights">
+        <h2>Built for reading</h2>
+        <ul>
+          <li><strong>Native desktop app</strong>Small Tauri bundle for macOS, Windows, and Linux.</li>
+          <li><strong>Live Markdown preview</strong>Open a file once and edits appear automatically.</li>
+          <li><strong>GitHub-style Markdown</strong>Tables, task lists, footnotes, alerts, and code blocks.</li>
+          <li><strong>Public-release ready</strong>macOS builds are prepared for Developer ID signing and notarization.</li>
+        </ul>
+      </aside>
+    </main>
+  </body>
+</html>

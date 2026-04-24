@@ -1,0 +1,87 @@
+#!/usr/bin/env python3
+import os
+import shutil
+import subprocess
+
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+ASSET_DIR = os.path.join(ROOT, "assets", "brand")
+SRC_ASSET_DIR = os.path.join(ROOT, "src", "assets", "brand")
+
+
+MARK_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <filter id="soft-shadow" x="-10%" y="-10%" width="120%" height="125%">
+      <feDropShadow dx="0" dy="22" stdDeviation="24" flood-color="#2b1d12" flood-opacity=".16"/>
+    </filter>
+  </defs>
+
+  <rect x="96" y="96" width="832" height="832" rx="214" fill="#fffaf0" filter="url(#soft-shadow)"/>
+
+  <path d="M247 793c74-28 121-70 140-126-46 32-93 50-141 54 72-57 114-117 126-179-45 32-88 51-129 57 74-71 119-146 135-224 38-185 211-250 380-167-53 8-101 24-144 49 79 8 156 38 232 90-64-2-124 7-181 27 70 23 132 63 185 120-82-2-154 9-215 34-9 80-46 146-112 198-69 55-161 77-276 67Z"
+        fill="#0d0d0c"/>
+
+  <path d="M481 367c57-55 130-73 218-53-55 18-98 48-129 89 59-9 118 0 176 27-68 7-124 28-168 63-44-46-76-88-97-126Z"
+        fill="#fffaf0"/>
+  <path d="M564 419c42-37 98-49 168-37-58 22-105 54-139 98-15-23-24-43-29-61Z"
+        fill="#fffaf0"/>
+
+  <path d="M593 474c77-57 176-48 297 28-89 14-162 45-218 94-18-52-44-92-79-122Z"
+        fill="#f0a335" stroke="#0d0d0c" stroke-width="34" stroke-linejoin="round"/>
+  <path d="M668 596c62 14 120 8 174-18-43 61-100 101-170 119-5-41-6-75-4-101Z"
+        fill="#f0a335" stroke="#0d0d0c" stroke-width="32" stroke-linejoin="round"/>
+
+  <path d="M461 494c57-45 112-54 165-26-55 2-97 19-126 52-12-6-25-15-39-26Z"
+        fill="#fffaf0"/>
+  <circle cx="535" cy="483" r="23" fill="#0d0d0c"/>
+  <circle cx="541" cy="476" r="8" fill="#fffaf0"/>
+
+  <path d="M342 659c82-28 146-72 192-132-38 82-99 142-183 180" fill="none" stroke="#fffaf0" stroke-width="28" stroke-linecap="round"/>
+  <path d="M310 721c79-18 139-51 182-99-39 65-94 112-165 141" fill="none" stroke="#fffaf0" stroke-width="24" stroke-linecap="round"/>
+  <path d="M381 405c54-75 121-120 201-135-65 37-116 88-154 153" fill="none" stroke="#fffaf0" stroke-width="24" stroke-linecap="round"/>
+</svg>
+"""
+
+
+README_ASCII = r"""
+    __/^^\__   Eagle Markdown
+  _/  o  >  \  fast native Markdown reading
+ /__/\___/__/  book-style pages
+      MD
+"""
+
+
+def write_text(path, content):
+    with open(path, "w", encoding="utf-8") as file:
+        file.write(content.strip() + "\n")
+
+
+def render_png(svg_path, png_path):
+    converter = shutil.which("rsvg-convert")
+    if not converter:
+        raise SystemExit("rsvg-convert is required to render the icon PNG.")
+
+    subprocess.run(
+        [converter, "--width", "1024", "--height", "1024", "--output", png_path, svg_path],
+        check=True,
+    )
+
+
+def main():
+    os.makedirs(ASSET_DIR, exist_ok=True)
+    os.makedirs(SRC_ASSET_DIR, exist_ok=True)
+
+    svg_paths = [
+        os.path.join(ASSET_DIR, "eagle-markdown-mark.svg"),
+        os.path.join(SRC_ASSET_DIR, "eagle-markdown-mark.svg"),
+    ]
+
+    for path in svg_paths:
+        write_text(path, MARK_SVG)
+
+    render_png(svg_paths[0], os.path.join(ROOT, "app-icon.png"))
+    render_png(svg_paths[0], os.path.join(ASSET_DIR, "eagle-markdown-icon.png"))
+    write_text(os.path.join(ASSET_DIR, "eagle-markdown-ascii.txt"), README_ASCII)
+
+
+if __name__ == "__main__":
+    main()

@@ -56,6 +56,12 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         with:
           tagName: ${{ github.ref_name }}
           releaseName: 'Eagle Markdown ${{ github.ref_name }}'
@@ -71,15 +77,10 @@ jobs:
             | Windows | `.msi` |
             | Linux | `.AppImage` / `.deb` |
 
-            ### macOS — first launch
+            ### macOS
 
-            Since the app isn't notarized with Apple, macOS will block it on first open.
-            **Right-click** the app → **Open** → click **Open** in the dialog. You only need to do this once.
-
-            If you see "damaged", run this in Terminal first:
-            ```
-            xattr -cr /Applications/Eagle\ Markdown.app
-            ```
-          releaseDraft: false
+            The macOS builds are intended to be Developer ID signed and notarized.
+            If a macOS asset shows an unidentified developer warning, do not publish it as a public release; check the Apple signing and notarization secrets in this workflow.
+          releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}

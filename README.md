@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/brand/eagle-markdown-icon.png" alt="Eagle Markdown icon" width="96" height="96">
+</p>
+
 # Eagle Markdown
 
 A fast, native Markdown viewer built with [Tauri](https://tauri.app) and [pulldown-cmark](https://github.com/pulldown-cmark/pulldown-cmark).
@@ -19,7 +23,7 @@ Grab the latest release for your platform:
 | Windows | `.msi` installer |
 | Linux | `.AppImage` / `.deb` |
 
-> **macOS note:** On first launch, macOS will block the app since it isn't notarized. **Right-click** the app → **Open** → click **Open** again. You only need to do this once. If you see "damaged", run `xattr -cr /Applications/Eagle\ Markdown.app` in Terminal first.
+> **macOS note:** Public macOS downloads should be Developer ID signed and notarized before release. That is the path that lets Gatekeeper verify the app without asking users to bypass system protections.
 
 ## Features
 
@@ -66,6 +70,33 @@ npx tauri build --bundles app
 ```
 
 The built `.app` (macOS), `.msi` (Windows), or `.AppImage` (Linux) will be in `src-tauri/target/release/bundle/`.
+
+## Publish a macOS Release
+
+For public macOS distribution outside the Mac App Store, use the release workflow with Apple Developer signing enabled:
+
+1. Enroll in the Apple Developer Program.
+2. Create a **Developer ID Application** certificate.
+3. Export the certificate as a password-protected `.p12` and base64 encode it.
+4. Add these GitHub Actions secrets:
+
+| Secret | Purpose |
+|--------|---------|
+| `APPLE_CERTIFICATE` | Base64-encoded `.p12` Developer ID certificate |
+| `APPLE_CERTIFICATE_PASSWORD` | Password used when exporting the `.p12` |
+| `APPLE_SIGNING_IDENTITY` | Certificate identity, for example `Developer ID Application: Name (TEAMID)` |
+| `APPLE_ID` | Apple ID email used for notarization |
+| `APPLE_PASSWORD` | App-specific password for that Apple ID |
+| `APPLE_TEAM_ID` | Apple Developer Team ID |
+
+Then create and push a version tag:
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+The GitHub release should only be made public after the macOS artifacts are signed and notarized successfully. See [docs/release-macos.md](docs/release-macos.md) for the checklist.
 
 ## Open a file from the terminal
 
