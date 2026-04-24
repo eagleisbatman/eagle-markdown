@@ -560,7 +560,7 @@ a:focus-visible {
   overflow-x: hidden;
   position: relative;
   scroll-behavior: smooth;
-  padding: 24px 22px 48px;
+  padding: 24px 22px 72px;
   perspective: 1800px;
 }
 
@@ -655,7 +655,7 @@ a:focus-visible {
 .markdown-body {
   max-width: 860px;
   margin: 0 auto;
-  padding: 54px clamp(28px, 6vw, 76px) 86px;
+  padding: 54px clamp(28px, 6vw, 76px) 110px;
   font-size: 16px;
   line-height: 1.7;
   color: var(--text);
@@ -706,7 +706,7 @@ a:focus-visible {
   max-width: none;
   margin: 0;
   overflow: hidden;
-  padding: 40px 46px 54px;
+  padding: 40px 46px 76px;
 }
 
 .book-spread:not(.book-spread-single) .spread-page:first-child {
@@ -898,18 +898,18 @@ a:focus-visible {
   }
 
   .markdown-body {
-    padding: 34px 24px 58px;
+    padding: 34px 24px 78px;
     font-size: 15px;
   }
 
   .spread-page {
-    padding: 32px 28px 44px;
+    padding: 32px 28px 64px;
   }
 }
 
 @media (max-width: 480px) {
   .markdown-body {
-    padding: 28px 18px 46px;
+    padding: 28px 18px 68px;
     font-size: 14px;
   }
   .markdown-body h1 { font-size: 1.6em; }
@@ -1021,6 +1021,8 @@ a:focus-visible {
   border-radius: 8px;
   overflow: hidden;
   background: var(--code-bg);
+  min-width: 0;
+  max-width: 100%;
 }
 
 .code-header {
@@ -1063,10 +1065,13 @@ a:focus-visible {
 .code-block pre {
   margin: 0;
   padding: 16px;
-  overflow-x: auto;
+  max-height: clamp(180px, calc(var(--reader-page-height) - 190px), 420px);
+  overflow: auto;
+  overscroll-behavior: contain;
   background: transparent;
   border: none;
   border-radius: 0;
+  scrollbar-gutter: stable both-edges;
 }
 
 .code-block pre code {
